@@ -1,0 +1,8 @@
+{
+  "project_type": "web",
+  "sub_project_type": "",
+  "name": "TikTok UGC脚本生成器",
+  "app_slug": "tiktok-ugc-generator",
+  "version_description": "添加收藏和删除功能",
+  "preview_type": "pc"
+}

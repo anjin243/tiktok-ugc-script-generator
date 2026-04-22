@@ -1,0 +1,12 @@
+[2026-04-21 18:09:43] [INFO] ==== setup-project.js =====
+[2026-04-21 18:09:43] [DEBUG] [PPT Setup] stdin 数据: {"session_id":"2046652003580387328","transcript_path":"/root/.codebuddy/projects/workspace/2046652003580387328.jsonl","cwd":"/workspace","hook_event_name":"PreToolUse","tool_name":"Skill","tool_input":{"skill":"web-implement"},"client":"CLI","version":"2.90.0","generation_id":"4a7c0ca48d714f9c9ea8b6279ccc4780","model":"glm-5.0","call_id":"call_21ec4e7ce4f94f47aae3865a"}
+[2026-04-21 18:09:43] [INFO] [PPT Setup] skill: web-implement
+[2026-04-21 18:09:43] [INFO] [PPT Setup] 跳过: skill 是 "web-implement"，不是 "ppt-implement"
+[2026-04-21 18:37:23] [INFO] ==== setup-project.js =====
+[2026-04-21 18:37:23] [DEBUG] [PPT Setup] stdin 数据: {"session_id":"2046652003580387328","transcript_path":"/root/.codebuddy/projects/workspace/2046652003580387328.jsonl","cwd":"/workspace","hook_event_name":"PreToolUse","tool_name":"Skill","tool_input":{"skill":"preview"},"client":"CLI","version":"2.90.0","generation_id":"566f61bbe2674f80b1c55e28acd2f08a","model":"glm-5.0","call_id":"call_ff8ead2b6f16467e9bd80a9f"}
+[2026-04-21 18:37:23] [INFO] [PPT Setup] skill: preview
+[2026-04-21 18:37:23] [INFO] [PPT Setup] 跳过: skill 是 "preview"，不是 "ppt-implement"
+[2026-04-21 22:40:34] [INFO] ==== setup-project.js =====
+[2026-04-21 22:40:34] [DEBUG] [PPT Setup] stdin 数据: {"session_id":"2046652003580387328","transcript_path":"/root/.codebuddy/projects/workspace/2046652003580387328.jsonl","cwd":"/workspace","hook_event_name":"PreToolUse","tool_name":"Skill","tool_input":{"skill":"preview"},"client":"CLI","version":"2.90.0","generation_id":"45ffd4b9f3c145d08d88273668c39a7b","model":"glm-5.1","call_id":"call_7194d0005ccd443f96727d6e"}
+[2026-04-21 22:40:34] [INFO] [PPT Setup] skill: preview
+[2026-04-21 22:40:34] [INFO] [PPT Setup] 跳过: skill 是 "preview"，不是 "ppt-implement"

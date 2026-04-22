@@ -1,0 +1,17 @@
+[
+  {
+    "pageKey": "Home",
+    "title": "Home Page",
+    "url": "/"
+  },
+  {
+    "pageKey": "Create",
+    "title": "Create Project",
+    "url": "/create"
+  },
+  {
+    "pageKey": "Projects",
+    "title": "My Projects",
+    "url": "/projects"
+  }
+]

@@ -1,0 +1,21 @@
+=== TikTok UGC 脚本生成器 - 核心代码 ===
+
+项目结构：
+- backend/  (Express + Prisma + PostgreSQL)
+- frontend/ (React + Vite + TypeScript)
+
+启动方式：
+1. 后端: cd backend && pnpm install && pnpm dev
+2. 前端: cd frontend && pnpm install && pnpm dev
+3. 数据库: PostgreSQL，连接串在 backend/.env
+
+环境变量 backend/.env:
+DATABASE_URL="postgres://postgres:Tencent2025@localhost:5432/genie?schema=public"
+
+关键文件说明：
+- backend/src/modules/generate.ts  # AI脚本生成核心逻辑
+- backend/src/modules/recognize.ts # 图片AI识别
+- backend/src/modules/project.ts   # 项目管理API
+- frontend/src/pages/Create.tsx    # 创建页面（4步流程）
+- frontend/src/components/SettingsDialog.tsx # AI配置弹窗
+

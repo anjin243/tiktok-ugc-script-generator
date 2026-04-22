@@ -1,0 +1,80 @@
+// Prisma Schema for UGC Video Generator
+// PostgreSQL database with TypeScript ORM
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 商品信息
+model Product {
+  id            String   @id @default(cuid())
+  name          String
+  price         Float
+  category      String
+  sellingPoints String[] // JSON array of selling points
+  images        String[] // URLs
+  videos        String[] // URLs
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  projects      Project[]
+}
+
+// 项目
+model Project {
+  id           String  @id @default(cuid())
+  name         String
+  style        String  // UGC style: unboxing, usage, comparison, story, voiceover
+  duration     Int     // seconds: 15, 30, 60
+  status       String  @default("draft") // draft, completed
+  
+  // 新增：多语言和视频比例
+  language     String  @default("zh-CN") // 目标语言: zh-CN, en-US, es-ES, pt-BR, id-ID, th-TH, vi-VN, fil-PH, ms-MY, ar-SA
+  aspectRatio  String  @default("9:16")  // 视频比例: 9:16, 16:9, 1:1, 4:5
+  
+  // 参考图（最多5张）
+  referenceImages String[] // 参考图URL列表
+  
+  // Generated content
+  scriptContent    String?  // Full script text
+  voiceover        String?  // Voiceover text
+  musicStyle       String?  // Recommended music style
+  
+  // Product relation
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  // Scenes (stored as JSON)
+  scenes    Scene[]
+  materials Material[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// 分镜
+model Scene {
+  id           String  @id @default(cuid())
+  order        Int
+  duration     Int     // seconds
+  description  String  // Visual description
+  voiceover    String  // Voiceover text for this scene
+  cameraAngle  String? // Camera angle suggestion
+  notes        String? // Shooting notes
+  projectId    String
+  project      Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+// 素材
+model Material {
+  id        String  @id @default(cuid())
+  type      String  // image, text
+  content   String  // URL or text content
+  prompt    String? // AI generation prompt
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
