@@ -6,12 +6,8 @@ import { env } from './config/env'
 import { errorHandler } from './middleware/errorHandler'
 import { httpLogger } from './middleware/logger'
 import { systemRouter } from './modules/system'
-// UGC Video Generator Modules
-import productRouter from './modules/product'
-import projectRouter from './modules/project'
-import generateRouter from './modules/generate'
-import recognizeRouter from './modules/recognize'
-import settingsRouter from './modules/settings'
+// Mock API (无需数据库)
+import mockRouter from './modules/mock-api'
 
 export const createApp = (): Application => {
   const app = express()
@@ -34,12 +30,8 @@ export const createApp = (): Application => {
   // API routes - System & Health
   app.use(env.API_PREFIX, systemRouter)
 
-  // UGC Video Generator API routes
-  app.use(`${env.API_PREFIX}/products`, productRouter)
-  app.use(`${env.API_PREFIX}/projects`, projectRouter)
-  app.use(`${env.API_PREFIX}/generate`, generateRouter)
-  app.use(`${env.API_PREFIX}/recognize`, recognizeRouter)
-  app.use(`${env.API_PREFIX}/settings`, settingsRouter)
+  // Mock API routes (无需数据库)
+  app.use(`${env.API_PREFIX}`, mockRouter)
 
   // Error handling
   app.use(errorHandler)

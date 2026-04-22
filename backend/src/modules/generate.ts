@@ -109,6 +109,345 @@ const LANGUAGE_NAMES: Record<string, string> = {
 
 // ============ AI大模型调用 ============
 
+// 智谱 GLM 生成脚本
+async function generateWithZhipu(
+  apiKey: string,
+  productName: string,
+  category: string,
+  sellingPoints: string[],
+  style: UGCStyle,
+  duration: number,
+  language: Language,
+  aspectRatio: string,
+  referenceImages: string[],
+  price?: number
+): Promise<{ scenes: ScenePrompt[]; voiceover: string; musicStyle: string; scriptContent: string }> {
+  const styleInfo = VIDEO_STYLE_INFO[style];
+  const sceneCount = duration <= 15 ? 3 : duration <= 30 ? 5 : 8;
+  const baseDuration = Math.floor(duration / sceneCount);
+  const langName = LANGUAGE_NAMES[language] || '中文';
+
+  const prompt = `你是专业的TikTok/UGC视频导演和编剧。你需要为AI视频生成模型（如即梦、可灵、Sora等）创建故事板脚本。
+
+请为以下产品创建一个${duration}秒的${styleInfo.name}风格UGC视频故事板：
+
+**产品**: ${productName}
+**类目**: ${category}
+**核心卖点**: ${sellingPoints.join(', ')}
+${price ? `**价格**: ${price}` : ''}
+**视频风格**: ${styleInfo.name} - ${styleInfo.description}
+**画面比例**: ${aspectRatio}
+**目标语言**: ${langName}
+**场景数量**: ${sceneCount}
+**每个场景时长**: 约${baseDuration}秒
+
+重要规则：
+1. 每个场景必须有"visualPrompt"字段，使用英文描述，给AI视频生成模型使用
+2. "visualPrompt"必须描述：镜头运动、镜头类型、主体、动作、环境、光线、情绪、色调
+3. 每个场景必须有"visualPromptCN"字段，使用${langName}描述
+4. "voiceover"字段必须使用${langName}
+5. 要有创意，每次生成都应该是新鲜的
+6. visualPrompt应该是2-4句话，富含视觉细节
+7. 使用专业电影术语：push in, pull out, tracking shot, dolly, crane, handheld, static, pan, tilt等
+
+请返回以下JSON格式（不要使用markdown代码块）：
+{
+  "scenes": [
+    {
+      "order": 1,
+      "duration": ${baseDuration},
+      "visualPrompt": "英文视觉描述...",
+      "visualPromptCN": "${langName}描述...",
+      "cameraMovement": "镜头运动",
+      "cameraAngle": "镜头类型",
+      "cameraDistance": "景别",
+      "subject": "画面主体",
+      "action": "场景动作",
+      "environment": "环境背景",
+      "lighting": "光线描述",
+      "mood": "情绪",
+      "colorTone": "色调",
+      "transition": "转场",
+      "voiceover": "${langName}口播",
+      "musicSuggestion": "音乐建议",
+      "startTime": 0,
+      "endTime": ${baseDuration}
+    }
+  ],
+  "voiceover": "完整口播稿（${langName}）",
+  "musicStyle": "音乐推荐（${langName}）",
+  "scriptContent": "完整格式化的脚本（${langName}）"
+}`;
+
+  console.log('[Zhipu] Generating script with GLM-4-Flash...');
+
+  const messages: any[] = [
+    { role: 'system', content: '你是专业的视频导演。请只返回JSON格式，不要使用markdown代码块。' },
+    { role: 'user', content: prompt },
+  ];
+
+  // 如果有参考图，加入图片分析
+  if (referenceImages.length > 0) {
+    const imageContent = referenceImages.slice(0, 3).map(img => ({
+      type: 'image_url',
+      image_url: { url: img, detail: 'low' },
+    }));
+    
+    messages.push({
+      role: 'user',
+      content: [
+        { type: 'text', text: '这是产品的参考图片。请根据图片创建更准确详细的场景描述。' },
+        ...imageContent,
+      ],
+    });
+  }
+
+  const response = await fetch('https://open.bigmodel.cn/api/paas/v4/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: 'glm-4-flash',
+      messages,
+      max_tokens: 4000,
+      temperature: 0.8,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('[Zhipu] API error:', response.status, errorText);
+    throw new Error(`Zhipu API error: ${response.status}`);
+  }
+
+  const data: any = await response.json();
+  const content = data.choices?.[0]?.message?.content || '';
+  console.log('[Zhipu] Response length:', content.length);
+
+  return parseAIResponse(content, sceneCount, baseDuration, duration, style, productName, category, sellingPoints, language);
+}
+
+// 硅基流动 API 生成脚本
+async function generateWithSiliconFlow(
+  apiKey: string,
+  productName: string,
+  category: string,
+  sellingPoints: string[],
+  style: UGCStyle,
+  duration: number,
+  language: Language,
+  aspectRatio: string,
+  referenceImages: string[],
+  price?: number
+): Promise<{ scenes: ScenePrompt[]; voiceover: string; musicStyle: string; scriptContent: string }> {
+  const styleInfo = VIDEO_STYLE_INFO[style];
+  const sceneCount = duration <= 15 ? 3 : duration <= 30 ? 5 : 8;
+  const baseDuration = Math.floor(duration / sceneCount);
+  const langName = LANGUAGE_NAMES[language] || '中文';
+
+  const prompt = `You are a professional video director and scriptwriter specializing in TikTok/UGC product videos. You create storyboard scripts optimized for AI video generation models (Jimeng, Kling, Sora, Runway Gen-3).
+
+Create a ${duration}-second ${styleInfo.name} style UGC video storyboard for the following product:
+
+**Product**: ${productName}
+**Category**: ${category}
+**Key Selling Points**: ${sellingPoints.join(', ')}
+${price ? `**Price**: ${price}` : ''}
+**Video Style**: ${styleInfo.name} - ${styleInfo.description}
+**Camera Style**: ${styleInfo.cameraStyle}
+**Lighting Style**: ${styleInfo.lightingStyle}
+**Mood**: ${styleInfo.mood}
+**Aspect Ratio**: ${aspectRatio}
+**Language**: ${langName}
+**Number of Scenes**: ${sceneCount}
+**Scene Duration**: ~${baseDuration} seconds each
+
+IMPORTANT RULES:
+1. Each scene must have "visualPrompt" in ENGLISH for AI video generation models
+2. "visualPromptCN" must be in ${langName}
+3. "voiceover" must be in ${langName}
+4. Be creative and unique each time
+5. visualPrompt should be 2-4 sentences with visual details
+6. Use cinematography terms: push in, pull out, tracking, handheld, static, pan, tilt, etc.
+
+Return ONLY valid JSON (no markdown code blocks):
+{
+  "scenes": [
+    {
+      "order": 1,
+      "duration": ${baseDuration},
+      "visualPrompt": "English visual prompt...",
+      "visualPromptCN": "${langName} description...",
+      "cameraMovement": "camera movement",
+      "cameraAngle": "shot type",
+      "cameraDistance": "shot distance",
+      "subject": "main subject",
+      "action": "scene action",
+      "environment": "setting",
+      "lighting": "lighting",
+      "mood": "mood",
+      "colorTone": "color tone",
+      "transition": "transition",
+      "voiceover": "${langName} voiceover",
+      "musicSuggestion": "music suggestion",
+      "startTime": 0,
+      "endTime": ${baseDuration}
+    }
+  ],
+  "voiceover": "Complete voiceover in ${langName}",
+  "musicStyle": "Music recommendation in ${langName}",
+  "scriptContent": "Full formatted script in ${langName}"
+}`;
+
+  console.log('[SiliconFlow] Generating script with Qwen...');
+
+  const messages: any[] = [
+    { role: 'system', content: 'You are a professional video director. Always respond with valid JSON only, no markdown code blocks.' },
+    { role: 'user', content: prompt },
+  ];
+
+  // 如果有参考图
+  if (referenceImages.length > 0) {
+    const imageContent = referenceImages.slice(0, 3).map(img => ({
+      type: 'image_url',
+      image_url: { url: img, detail: 'low' },
+    }));
+    
+    messages.push({
+      role: 'user',
+      content: [
+        { type: 'text', text: 'These are reference images of the product. Use them to create accurate scene descriptions.' },
+        ...imageContent,
+      ],
+    });
+  }
+
+  const response = await fetch('https://api.siliconflow.cn/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: 'Qwen/Qwen2.5-7B-Instruct',
+      messages,
+      max_tokens: 4000,
+      temperature: 0.8,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('[SiliconFlow] API error:', response.status, errorText);
+    throw new Error(`SiliconFlow API error: ${response.status}`);
+  }
+
+  const data: any = await response.json();
+  const content = data.choices?.[0]?.message?.content || '';
+  console.log('[SiliconFlow] Response length:', content.length);
+
+  return parseAIResponse(content, sceneCount, baseDuration, duration, style, productName, category, sellingPoints, language);
+}
+
+// Ollama 本地生成脚本
+async function generateWithOllama(
+  baseUrl: string,
+  model: string,
+  productName: string,
+  category: string,
+  sellingPoints: string[],
+  style: UGCStyle,
+  duration: number,
+  language: Language,
+  aspectRatio: string,
+  referenceImages: string[],
+  price?: number
+): Promise<{ scenes: ScenePrompt[]; voiceover: string; musicStyle: string; scriptContent: string }> {
+  const styleInfo = VIDEO_STYLE_INFO[style];
+  const sceneCount = duration <= 15 ? 3 : duration <= 30 ? 5 : 8;
+  const baseDuration = Math.floor(duration / sceneCount);
+  const langName = LANGUAGE_NAMES[language] || '中文';
+
+  const prompt = `你是专业的TikTok/UGC视频导演和编剧。你需要为AI视频生成模型（如即梦、可灵等）创建故事板脚本。
+
+产品信息：
+- 产品名称: ${productName}
+- 类目: ${category}
+- 核心卖点: ${sellingPoints.join(', ')}
+${price ? `- 价格: ${price}` : ''}
+- 视频风格: ${styleInfo.name} - ${styleInfo.description}
+- 画面比例: ${aspectRatio}
+- 目标语言: ${langName}
+- 场景数量: ${sceneCount}
+- 每个场景时长: 约${baseDuration}秒
+
+请返回JSON格式的故事板：
+{
+  "scenes": [
+    {
+      "order": 1,
+      "duration": ${baseDuration},
+      "visualPrompt": "英文视觉描述（给AI视频模型用）",
+      "visualPromptCN": "${langName}描述",
+      "cameraMovement": "镜头运动",
+      "cameraAngle": "镜头类型",
+      "cameraDistance": "景别",
+      "subject": "画面主体",
+      "action": "场景动作",
+      "environment": "环境背景",
+      "lighting": "光线描述",
+      "mood": "情绪",
+      "colorTone": "色调",
+      "transition": "转场",
+      "voiceover": "${langName}口播",
+      "musicSuggestion": "音乐建议",
+      "startTime": 0,
+      "endTime": ${baseDuration}
+    }
+  ],
+  "voiceover": "完整口播稿（${langName}）",
+  "musicStyle": "音乐推荐（${langName}）",
+  "scriptContent": "完整格式化的脚本（${langName}）"
+}`;
+
+  console.log(`[Ollama] Generating script with ${model} at ${baseUrl}...`);
+
+  const messages: any[] = [
+    { role: 'system', content: '你是专业的视频导演。请只返回JSON格式，不要使用markdown代码块。' },
+    { role: 'user', content: prompt },
+  ];
+
+  const response = await fetch(`${baseUrl}/api/chat`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: model || 'llama3.2',
+      messages,
+      stream: false,
+      options: {
+        temperature: 0.8,
+        num_predict: 4000,
+      },
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('[Ollama] API error:', response.status, errorText);
+    throw new Error(`Ollama API error: ${response.status}`);
+  }
+
+  const data: any = await response.json();
+  const content = data.message?.content || '';
+  console.log('[Ollama] Response length:', content.length);
+
+  return parseAIResponse(content, sceneCount, baseDuration, duration, style, productName, category, sellingPoints, language);
+}
+
 // OpenAI GPT 生成脚本
 async function generateWithOpenAI(
   apiKey: string,
@@ -675,7 +1014,68 @@ router.post('/script', async (req: Request, res: Response) => {
 
     if (provider && keys) {
       try {
-        if (provider === 'openai' && keys.openai) {
+        // 免费模型支持
+        if (provider === 'siliconflow' && keys.apiKey) {
+          const result = await generateWithSiliconFlow(
+            keys.apiKey,
+            data.productName,
+            data.category,
+            data.sellingPoints,
+            data.style,
+            data.duration,
+            data.language || 'zh-CN',
+            data.aspectRatio || '9:16',
+            data.referenceImages || [],
+            data.price
+          );
+          scenes = result.scenes;
+          voiceover = result.voiceover;
+          musicStyle = result.musicStyle;
+          scriptContent = result.scriptContent;
+          usedAI = true;
+          aiProvider = '硅基流动 (Qwen)';
+        } else if (provider === 'zhipu-free' && keys.apiKey) {
+          const result = await generateWithZhipu(
+            keys.apiKey,
+            data.productName,
+            data.category,
+            data.sellingPoints,
+            data.style,
+            data.duration,
+            data.language || 'zh-CN',
+            data.aspectRatio || '9:16',
+            data.referenceImages || [],
+            data.price
+          );
+          scenes = result.scenes;
+          voiceover = result.voiceover;
+          musicStyle = result.musicStyle;
+          scriptContent = result.scriptContent;
+          usedAI = true;
+          aiProvider = '智谱 AI (GLM-4-Flash)';
+        } else if (provider === 'ollama' && keys.baseUrl) {
+          const result = await generateWithOllama(
+            keys.baseUrl,
+            keys.model || 'llama3.2',
+            data.productName,
+            data.category,
+            data.sellingPoints,
+            data.style,
+            data.duration,
+            data.language || 'zh-CN',
+            data.aspectRatio || '9:16',
+            data.referenceImages || [],
+            data.price
+          );
+          scenes = result.scenes;
+          voiceover = result.voiceover;
+          musicStyle = result.musicStyle;
+          scriptContent = result.scriptContent;
+          usedAI = true;
+          aiProvider = `Ollama 本地 (${keys.model || 'llama3.2'})`;
+        }
+        // 付费模型支持
+        else if (provider === 'openai' && keys.openai) {
           const result = await generateWithOpenAI(
             keys.openai,
             data.productName,

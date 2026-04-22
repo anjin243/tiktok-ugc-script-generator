@@ -126,81 +126,81 @@
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  /* === UGC Video 配色 (Dark Cinema + Coral CTA) === */
-  /* 背景 - 深黑色系 */
-  --background: oklch(0.08 0.01 270);          /* #0F0F23 深紫黑 */
-  --foreground: oklch(0.98 0.005 270);         /* #F8FAFC 明亮白 */
+  /* === UGC Video 配色 (Modern Dark + Vibrant Accents) === */
+  /* 背景 - 现代深灰色系 */
+  --background: oklch(0.15 0.01 250);          /* #1F1F2E 深灰蓝 */
+  --foreground: oklch(0.98 0.005 250);         /* #F8FAFC 明亮白 */
 
-  /* 卡片 - 次深色 */
-  --card: oklch(0.12 0.02 270);                /* #1A1A2E */
-  --card-foreground: oklch(0.98 0.005 270);
+  /* 卡片 - 突出层次 */
+  --card: oklch(0.20 0.015 250);               /* #2D2D3A */
+  --card-foreground: oklch(0.98 0.005 250);
 
   /* 弹出层 */
-  --popover: oklch(0.14 0.02 270);
-  --popover-foreground: oklch(0.98 0.005 270);
+  --popover: oklch(0.22 0.015 250);
+  --popover-foreground: oklch(0.98 0.005 250);
 
-  /* 主色调 - 珊瑚红/播放红 */
-  --primary: oklch(0.55 0.22 12);              /* #E11D48 珊瑚红 */
-  --primary-foreground: oklch(0.98 0.005 270);
+  /* 主色调 - 活力红 */
+  --primary: oklch(0.60 0.22 15);             /* #E53E3E 活力红 */
+  --primary-foreground: oklch(0.99 0.005 250);
 
-  /* 次要色 - 深紫 */
-  --secondary: oklch(0.18 0.06 270);           /* #1E1B4B */
-  --secondary-foreground: oklch(0.98 0.005 270);
+  /* 次要色 - 蓝灰色 */
+  --secondary: oklch(0.25 0.08 250);            /* #374151 */
+  --secondary-foreground: oklch(0.95 0.005 250);
 
   /* 柔和色 */
-  --muted: oklch(0.15 0.02 270);
-  --muted-foreground: oklch(0.65 0.01 270);
+  --muted: oklch(0.25 0.01 250);
+  --muted-foreground: oklch(0.60 0.01 250);
 
-  /* 强调色 - 渐变紫 */
-  --accent: oklch(0.35 0.12 280);              /* 紫色强调 */
-  --accent-foreground: oklch(0.98 0.005 270);
+  /* 强调色 - 科技蓝 */
+  --accent: oklch(0.60 0.15 230);             /* 蓝色强调 */
+  --accent-foreground: oklch(0.99 0.005 250);
 
   /* 危险/错误色 */
-  --destructive: oklch(0.55 0.22 12);
+  --destructive: oklch(0.60 0.22 15);
 
   /* 边框和输入框 */
-  --border: oklch(0.25 0.03 270);
-  --input: oklch(0.18 0.03 270);
-  --ring: oklch(0.55 0.22 12);
+  --border: oklch(0.30 0.02 250);
+  --input: oklch(0.18 0.015 250);
+  --ring: oklch(0.60 0.22 15);
 
   /* === 功能颜色 === */
-  --success: oklch(0.65 0.15 155);
-  --success-foreground: oklch(0.98 0.005 270);
-  --warning: oklch(0.75 0.18 55);
-  --warning-foreground: oklch(0.08 0.01 270);
-  --info: oklch(0.60 0.18 260);
-  --info-foreground: oklch(0.98 0.005 270);
+  --success: oklch(0.65 0.18 160);
+  --success-foreground: oklch(0.15 0.01 160);
+  --warning: oklch(0.75 0.18 70);
+  --warning-foreground: oklch(0.15 0.01 70);
+  --info: oklch(0.65 0.18 230);
+  --info-foreground: oklch(0.15 0.01 230);
 
-  /* === 主题特色颜色 (UGC Video Brand) === */
-  --theme-red: oklch(0.55 0.22 12);            /* 珊瑚红 - 主 CTA */
-  --theme-pink: oklch(0.70 0.18 340);          /* 粉色 - 点缀 */
-  --theme-purple: oklch(0.50 0.18 280);        /* 紫色 - 强调 */
-  --theme-blue: oklch(0.55 0.18 240);          /* 蓝色 - 信息 */
+  /* === 主题特色颜色 === */
+  --theme-red: oklch(0.60 0.22 15);
+  --theme-pink: oklch(0.70 0.18 350);
+  --theme-purple: oklch(0.55 0.18 280);
+  --theme-blue: oklch(0.60 0.18 230);
 
   /* === 图表颜色 === */
-  --chart-1: oklch(0.55 0.22 12);              /* 珊瑚红 */
-  --chart-2: oklch(0.70 0.18 340);             /* 粉色 */
-  --chart-3: oklch(0.50 0.18 280);             /* 紫色 */
-  --chart-4: oklch(0.55 0.18 240);             /* 蓝色 */
-  --chart-5: oklch(0.65 0.15 155);             /* 绿色 */
+  --chart-1: oklch(0.60 0.22 15);
+  --chart-2: oklch(0.70 0.18 350);
+  --chart-3: oklch(0.55 0.18 280);
+  --chart-4: oklch(0.60 0.18 230);
+  --chart-5: oklch(0.65 0.18 160);
 
   /* === 侧边栏 === */
-  --sidebar: oklch(0.10 0.02 270);
-  --sidebar-foreground: oklch(0.98 0.005 270);
-  --sidebar-primary: oklch(0.55 0.22 12);
-  --sidebar-primary-foreground: oklch(0.98 0.005 270);
-  --sidebar-accent: oklch(0.18 0.04 270);
-  --sidebar-accent-foreground: oklch(0.98 0.005 270);
-  --sidebar-border: oklch(0.25 0.03 270);
-  --sidebar-ring: oklch(0.55 0.22 12);
+  --sidebar: oklch(0.12 0.01 250);
+  --sidebar-foreground: oklch(0.98 0.005 250);
+  --sidebar-primary: oklch(0.60 0.22 15);
+  --sidebar-primary-foreground: oklch(0.99 0.005 250);
+  --sidebar-accent: oklch(0.25 0.03 250);
+  --sidebar-accent-foreground: oklch(0.98 0.005 250);
+  --sidebar-border: oklch(0.28 0.02 250);
+  --sidebar-ring: oklch(0.60 0.22 15);
 
   /* === Hero 区域 === */
-  --hero: oklch(0.06 0.01 270);                /* 更深的背景 */
-  --hero-foreground: oklch(0.98 0.005 270);
+  --hero: oklch(0.12 0.01 250);
+  --hero-foreground: oklch(0.98 0.005 250);
 
-  /* === 发光效果 === */
-  --glow-primary: 0 0 20px oklch(0.55 0.22 12 / 0.4);
-  --glow-accent: 0 0 30px oklch(0.50 0.18 280 / 0.3);
+  /* === 发光效果（简化） === */
+  --glow-primary: 0 0 15px oklch(0.60 0.22 15 / 0.35);
+  --glow-accent: 0 0 15px oklch(0.60 0.18 230 / 0.25);
 }
 
 /* UGC Video - 保持深色主题，.dark 类继承 :root 的深色配色 */
@@ -317,4 +317,68 @@
   .page-transition {
     transition: none !important;
   }
+}
+
+/* ================================================================
+   Lightweight CSS Animations (replaces framer-motion viewport)
+   ================================================================ */
+
+/* Fade-in animation - triggers on mount */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+  opacity: 0;
+}
+
+/* Stagger-in animation - children stagger automatically */
+@keyframes staggerIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-stagger-in > * {
+  opacity: 0;
+  animation: staggerIn 0.35s ease-out forwards;
+}
+
+/* Stagger delays for children */
+.animate-stagger-in > *:nth-child(1) { animation-delay: 0ms; }
+.animate-stagger-in > *:nth-child(2) { animation-delay: 60ms; }
+.animate-stagger-in > *:nth-child(3) { animation-delay: 120ms; }
+.animate-stagger-in > *:nth-child(4) { animation-delay: 180ms; }
+.animate-stagger-in > *:nth-child(5) { animation-delay: 240ms; }
+.animate-stagger-in > *:nth-child(6) { animation-delay: 300ms; }
+.animate-stagger-in > *:nth-child(7) { animation-delay: 360ms; }
+.animate-stagger-in > *:nth-child(8) { animation-delay: 420ms; }
+.animate-stagger-in > *:nth-child(n+9) { animation-delay: 480ms; }
+
+/* Subtle hover effect for cards */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px oklch(0 0 0 / 0.3);
+}
+
+/* Performance: Use GPU acceleration */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
 }

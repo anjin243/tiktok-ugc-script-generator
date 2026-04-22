@@ -1,134 +1,67 @@
-import { motion, type Variants, type HTMLMotionProps } from 'framer-motion';
 import { forwardRef, type ReactNode } from 'react';
+import { motion } from 'framer-motion';
 
-// ── Shared easing & duration tokens ──
-const ease = [0.25, 0.46, 0.45, 0.94] as const;
-const springBounce = { type: 'spring', damping: 20, stiffness: 300 } as const;
+// ── Lightweight CSS Animation Wrapper ──
+// Replaces framer-motion viewport animations with simple CSS classes for performance
 
-// ── Variant factories ──
-export const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 32 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease } },
-};
-
-export const fadeDown: Variants = {
-  hidden: { opacity: 0, y: -24 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease } },
-};
-
-export const fadeIn: Variants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.5, ease } },
-};
-
-export const fadeLeft: Variants = {
-  hidden: { opacity: 0, x: -32 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease } },
-};
-
-export const fadeRight: Variants = {
-  hidden: { opacity: 0, x: 32 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease } },
-};
-
-export const scaleUp: Variants = {
-  hidden: { opacity: 0, scale: 0.92 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease } },
-};
-
-export const blurIn: Variants = {
-  hidden: { opacity: 0, filter: 'blur(12px)' },
-  visible: { opacity: 1, filter: 'blur(0px)', transition: { duration: 0.6, ease } },
-};
-
-// ── Stagger container ──
-export const staggerContainer = (stagger = 0.1, delay = 0): Variants => ({
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: stagger,
-      delayChildren: delay,
-    },
-  },
-});
-
-// ── Generic viewport-triggered wrapper ──
-interface FadeInProps extends HTMLMotionProps<'div'> {
+interface AnimationProps {
   children: ReactNode;
-  variants?: Variants;
-  delay?: number;
-  duration?: number;
   className?: string;
-  once?: boolean;
-  amount?: number;
+  style?: React.CSSProperties;
 }
 
-export const FadeIn = forwardRef<HTMLDivElement, FadeInProps>(
-  ({ children, variants = fadeUp, delay = 0, duration, className, once = true, amount = 0.2, ...props }, ref) => (
-    <motion.div
+// Simple fade-in animation (triggers on mount)
+export const FadeIn = forwardRef<HTMLDivElement, AnimationProps & { delay?: number }>(
+  ({ children, className = '', delay = 0, style, ...props }, ref) => (
+    <div
       ref={ref}
-      variants={variants}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once, amount }}
-      transition={delay || duration ? { delay, ...(duration ? { duration } : {}) } : undefined}
-      className={className}
+      className={`animate-fade-in ${className}`}
+      style={{
+        animationDelay: `${delay}ms`,
+        ...style,
+      }}
       {...props}
     >
       {children}
-    </motion.div>
-  ),
+    </div>
+  )
 );
 FadeIn.displayName = 'FadeIn';
 
-// ── Stagger parent (triggers children) ──
-interface StaggerProps extends HTMLMotionProps<'div'> {
-  children: ReactNode;
+// Stagger container (just applies flex/grid layout)
+interface StaggerProps extends AnimationProps {
   stagger?: number;
-  delay?: number;
-  className?: string;
-  once?: boolean;
-  amount?: number;
 }
 
 export const Stagger = forwardRef<HTMLDivElement, StaggerProps>(
-  ({ children, stagger = 0.1, delay = 0, className, once = true, amount = 0.15, ...props }, ref) => (
-    <motion.div
+  ({ children, className = '', stagger, ...props }, ref) => (
+    <div
       ref={ref}
-      variants={staggerContainer(stagger, delay)}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once, amount }}
-      className={className}
+      className={`animate-stagger-in ${className}`}
+      data-stagger={stagger}
       {...props}
     >
       {children}
-    </motion.div>
-  ),
+    </div>
+  )
 );
 Stagger.displayName = 'Stagger';
 
-// ── Hover-lift card wrapper ──
-interface HoverLiftProps extends HTMLMotionProps<'div'> {
-  children: ReactNode;
-  className?: string;
-  lift?: number;
-}
+// Hover lift effect (CSS only, no JS overhead)
+interface HoverLiftProps extends AnimationProps {}
 
 export const HoverLift = forwardRef<HTMLDivElement, HoverLiftProps>(
-  ({ children, className, lift = -4, ...props }, ref) => (
-    <motion.div
+  ({ children, className = '', ...props }, ref) => (
+    <div
       ref={ref}
-      variants={fadeUp}
-      whileHover={{ y: lift, transition: { duration: 0.25, ease: 'easeOut' } }}
-      className={className}
+      className={`transition-transform duration-200 hover:-translate-y-1 ${className}`}
       {...props}
     >
       {children}
-    </motion.div>
-  ),
+    </div>
+  )
 );
 HoverLift.displayName = 'HoverLift';
 
-// Re-export motion for convenience
-export { motion, springBounce };
+// Re-export motion for components that need it (e.g., PageTransition)
+export { motion };

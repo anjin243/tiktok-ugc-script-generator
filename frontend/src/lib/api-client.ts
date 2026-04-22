@@ -4,9 +4,6 @@ import axios, { AxiosError } from 'axios';
 const getBaseURL = () => {
   // 在浏览器环境中检测是否在预览环境
   if (typeof window !== 'undefined') {
-    const hostname = window.location.hostname;
-    const port = new URLSearchParams(window.location.search).get('x-cs-sandbox-port');
-    
     // 如果是预览环境，使用当前端口（因为 Vite 代理会转发）
     // Vite 开发服务器会代理 /api 请求到后端
     return '/api';

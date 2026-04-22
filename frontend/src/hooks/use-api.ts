@@ -194,6 +194,7 @@ export function useRecognizeImage() {
       // 获取保存的配置
       const saved = localStorage.getItem('ai_api_config');
       let config = null;
+      let supportsVision = false;
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
@@ -201,6 +202,7 @@ export function useRecognizeImage() {
             provider: parsed.provider,
             keys: parsed.keys,
           };
+          supportsVision = parsed.supportsVision || false;
         } catch (e) {
           console.error('Parse config error:', e);
         }
@@ -209,8 +211,9 @@ export function useRecognizeImage() {
       const response = await apiClient.post<ApiResponse<RecognizeResult>>('/recognize/image', {
         image: imageBase64,
         config,
+        useAI: supportsVision,
       });
-      return response.data.data;
+      return response.data.data!;
     },
   });
 }
