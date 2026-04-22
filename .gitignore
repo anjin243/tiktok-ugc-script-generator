@@ -1,0 +1,8 @@
+node_modules/
+.cloudstudio/
+.codebuddy/
+downloads/
+下载/
+*.tar.gz
+*.env
+.DS_Store
