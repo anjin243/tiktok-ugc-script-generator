@@ -30,7 +30,9 @@
       }
       window.addEventListener('error', showStartupFailure)
       window.addEventListener('unhandledrejection', showStartupFailure)
-      window.setTimeout(showStartupFailure, 15000)
+      window.setTimeout(() => {
+        if (document.getElementById('startup-status')) showStartupFailure()
+      }, 15000)
     </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
