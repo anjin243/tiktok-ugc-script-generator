@@ -8,7 +8,7 @@ web application template with monorepo structure.
 
 ## Audited project status
 
-This is a working React/Express UGC script/storyboard prototype. By default, the backend mounts an in-memory template generator (`usedAI: false`); provider-backed AI code exists separately but is not mounted. It does not generate a finished video. See `PROJECT_AUDIT.md`.
+This is a working React/Express UGC script/storyboard prototype with a free local FFmpeg image-ad exporter and a separate guarded, paid human-AI-video phase-one workflow. The default script route still uses the in-memory template generator (`usedAI: false`). See `PROJECT_AUDIT.md`.
 
 ## Windows setup
 
@@ -61,6 +61,10 @@ Optional AI, hosted database, and video-generation services may charge and trans
 ### Basic UGC MP4 export
 
 The current development branch includes a free local FFmpeg export path for 3–8 real product images. It creates a 15-second 1080×1920 MP4 with motion, Malay or bilingual captions, optional voiceover, and low-volume background music. See [docs/UGC_VIDEO_EXPORT.md](docs/UGC_VIDEO_EXPORT.md) for Windows setup, API details, safety limits, and the outdoor fishing hat integration test.
+
+### Human AI video phase 1
+
+The separate paid mode adds guarded OpenAI Videos API planning, current Sora cost estimates, explicit cost authorization, one-scene-at-a-time submission, status polling, preview, product-truth review, and cancellation of future scenes. Tests use a fake client and make no paid request. See [docs/AI_HUMAN_VIDEO_PHASE1.md](docs/AI_HUMAN_VIDEO_PHASE1.md).
 
 React UI, in-memory products/projects, template UGC script/storyboard generation, local image compression, project display, repository audit, and Malaysia UGC Codex skill.
 

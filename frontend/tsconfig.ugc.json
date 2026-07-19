@@ -5,6 +5,7 @@
   },
   "include": [
     "src/pages/UgcExport.tsx",
+    "src/pages/AiVideo.tsx",
     "src/lib/ephemeral-ai-config.ts"
   ]
 }

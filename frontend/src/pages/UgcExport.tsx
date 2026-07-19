@@ -178,6 +178,10 @@ const UgcExport = () => {
             ? `FFmpeg ${capabilities.ffmpeg && capabilities.ffprobe ? '可用' : '未就绪'}；免费马来语 TTS ${capabilities.freeMalayTts ? '可用' : '未检测到，可上传配音'}`
             : '正在检测……'}
         </div>
+        <div className="mb-6 flex gap-2 rounded-xl border border-border bg-card p-2 text-sm">
+          <span className="rounded-lg bg-primary px-4 py-2 text-primary-foreground">图片广告模式 · 免费FFmpeg</span>
+          <Link className="rounded-lg px-4 py-2 hover:bg-muted" to="/ai-video">真人AI视频 · 付费模型</Link>
+        </div>
 
         <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
           <div className="space-y-6">

@@ -76,6 +76,18 @@ const Index = () => {
                   基础 MP4 自动导出
                 </Button>
               </Link>
+              <Link to="/ai-video">
+                <Button size="lg" variant="outline" style={{
+                  borderColor: 'var(--warning)',
+                  color: 'var(--foreground)',
+                  padding: '14px 32px',
+                  fontSize: '1rem',
+                  borderRadius: '12px',
+                }}>
+                  <Zap className="w-5 h-5 mr-2" />
+                  真人AI视频（付费）
+                </Button>
+              </Link>
               <Link to="/projects">
                 <Button size="lg" variant="outline" style={{
                   borderColor: 'var(--border)',
