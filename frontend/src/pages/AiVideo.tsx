@@ -187,6 +187,10 @@ const AiVideo = () => {
   }
 
   const authorizeCost = async () => {
+    if (capabilities?.apiKeyConfigured !== true) {
+      setMessage('无法确认费用：后端尚未配置 OPENAI_API_KEY。请先在后端进程环境变量中配置密钥并重启后端；不要把密钥粘贴到网页或聊天中。')
+      return
+    }
     if (!task || !feeConfirmed || confirmationPhrase !== capabilities?.explicitConfirmationPhrase) return
     setBusy(true)
     setMessage('')
@@ -336,10 +340,12 @@ const AiVideo = () => {
               <CardContent className="space-y-4">
                 {!task ? <div className="rounded-lg bg-muted p-6 text-center text-sm text-muted-foreground">先在左侧创建无费用任务</div> : <>
                   <div className="rounded-lg border border-border p-3 text-sm">任务：{task.id}<br />状态：{task.status}<br />估算上限：${task.estimate.estimatedTotalUsd.toFixed(2)} USD</div>
+                  {message && <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">{message}</div>}
                   {!task.costAuthorizedAt && <div className="space-y-3 rounded-lg border border-warning/50 bg-warning/10 p-4">
+                    {capabilities?.apiKeyConfigured !== true && <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive"><strong>费用确认暂不可用：</strong>后端未配置 <code>OPENAI_API_KEY</code>。请先在后端进程环境变量中配置并重启后端。密钥不要粘贴到本页或聊天中。</div>}
                     <label className="flex gap-2 text-sm"><input type="checkbox" checked={feeConfirmed} onChange={event => setFeeConfirmed(event.target.checked)} />我已查看调用次数和预计费用，并理解失败镜头也可能产生费用。</label>
                     <Input placeholder={`输入“${capabilities?.explicitConfirmationPhrase ?? '确认付费生成'}”`} value={confirmationPhrase} onChange={event => setConfirmationPhrase(event.target.value)} />
-                    <Button className="w-full" onClick={authorizeCost} disabled={busy || !feeConfirmed || confirmationPhrase !== capabilities?.explicitConfirmationPhrase}><ShieldCheck className="mr-2 h-4 w-4" />确认费用（仍不生成）</Button>
+                    <Button className="w-full" onClick={authorizeCost} disabled={busy || capabilities?.apiKeyConfigured !== true || !feeConfirmed || confirmationPhrase !== capabilities?.explicitConfirmationPhrase}><ShieldCheck className="mr-2 h-4 w-4" />{capabilities?.apiKeyConfigured === false ? '请先配置后端 API 密钥' : '确认费用（仍不生成）'}</Button>
                   </div>}
                   {task.costAuthorizedAt && <div className="rounded-lg border border-success/40 bg-success/10 p-3 text-sm"><CheckCircle2 className="mr-2 inline h-4 w-4" />费用已确认。点击某个镜头的生成按钮时才会发生一次付费调用。</div>}
                   <div className="space-y-3">{task.scenes.map(scene => {
