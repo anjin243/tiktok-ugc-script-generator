@@ -14,6 +14,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { Settings, Info, Check, ExternalLink, Image, Zap, Gift, Server, Download, Globe } from 'lucide-react';
+import { getEphemeralAiConfig, setEphemeralAiConfig } from '@/lib/ephemeral-ai-config';
 
 interface ApiKeyConfig {
   provider: string;
@@ -324,12 +325,11 @@ const SettingsDialog = ({ onConfigChange }: SettingsDialogProps) => {
   const [isSaving, setIsSaving] = useState(false);
   const [showFreeModels, setShowFreeModels] = useState(true); // 默认显示免费模型
 
-  // 从本地存储加载配置
+  // 仅从当前页面会话的内存中加载配置，不持久化密钥。
   useEffect(() => {
-    const saved = localStorage.getItem('ai_api_config');
+    const saved = getEphemeralAiConfig();
     if (saved) {
-      try {
-        const config = JSON.parse(saved);
+        const config = saved;
         // 先在免费模型中查找
         let provider = FREE_AI_PROVIDERS.find(p => p.id === config.provider);
         // 如果找不到，再在常规模型中查找
@@ -346,9 +346,6 @@ const SettingsDialog = ({ onConfigChange }: SettingsDialogProps) => {
           setApiKeys({});
           toast.info('未找到已配置的服务商，已重置为默认');
         }
-      } catch (e) {
-        console.error('Failed to load config:', e);
-      }
     }
   }, []);
 
@@ -377,14 +374,14 @@ const SettingsDialog = ({ onConfigChange }: SettingsDialogProps) => {
         apiSecret: provider.fields[1] ? apiKeys[provider.fields[1].id] : undefined,
       };
       
-      localStorage.setItem('ai_api_config', JSON.stringify({
+      setEphemeralAiConfig({
         provider: selectedProvider,
         keys: apiKeys,
         model: (provider as any).model,
         visionModel: (provider as any).visionModel,
         supportsVision: provider.supportsVision,
         isLocal: (provider as any).local,
-      }));
+      });
 
       const enableText = provider.supportsVision 
         ? 'AI图片识别+AI脚本生成已启用' 

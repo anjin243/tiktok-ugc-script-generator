@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite --strictPort -l error",
     "build": "tsc -b && vite build",
+    "typecheck:ugc": "tsc -p tsconfig.ugc.json --noEmit",
     "lint": "eslint .",
     "preview": "vite preview"
   },

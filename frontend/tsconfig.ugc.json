@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.ugc.tsbuildinfo"
+  },
+  "include": [
+    "src/pages/UgcExport.tsx",
+    "src/lib/ephemeral-ai-config.ts"
+  ]
+}

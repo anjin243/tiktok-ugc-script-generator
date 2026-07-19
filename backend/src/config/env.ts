@@ -1,7 +1,9 @@
 import dotenv from 'dotenv'
 import { z } from 'zod'
 
-dotenv.config()
+if (process.env.SKIP_DOTENV !== '1') {
+  dotenv.config()
+}
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),

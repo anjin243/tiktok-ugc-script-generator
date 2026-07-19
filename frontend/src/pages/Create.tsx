@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { FadeIn, Stagger, HoverLift } from '@/components/MotionPrimitives';
 import { useCreateProject, useGenerateScript, useRecognizeImage } from '@/hooks/use-api';
 import SettingsDialog from '@/components/SettingsDialog';
+import { getEphemeralAiConfig } from '@/lib/ephemeral-ai-config';
 import {
   UGC_STYLE_OPTIONS,
   CATEGORY_OPTIONS,
@@ -277,15 +278,8 @@ const Create = () => {
   const [showBanner, setShowBanner] = useState(true);
 
   useEffect(() => {
-    const saved = localStorage.getItem('ai_api_config');
-    if (saved) {
-      try {
-        const config = JSON.parse(saved);
-        setHasApiKey(!!config.provider && !!config.keys);
-      } catch (e) {
-        setHasApiKey(false);
-      }
-    }
+    const config = getEphemeralAiConfig();
+    setHasApiKey(!!config?.provider && Object.values(config.keys).some(Boolean));
   }, []);
 
   const [step, setStep] = useState<Step>('product');
@@ -394,27 +388,12 @@ const Create = () => {
   const sellingPointRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const checkAIConfigured = () => {
-    try {
-      const saved = localStorage.getItem('ai_api_config');
-      if (saved) {
-        const parsed = JSON.parse(saved) as { keys?: Record<string, string | undefined> };
-        if (parsed.keys) {
-          return Object.values(parsed.keys).some(v => v && typeof v === 'string' && v.trim());
-        }
-      }
-    } catch { }
-    return false;
+    const saved = getEphemeralAiConfig();
+    return Object.values(saved?.keys || {}).some(v => typeof v === 'string' && v.trim());
   };
 
   const checkSupportsVision = () => {
-    try {
-      const saved = localStorage.getItem('ai_api_config');
-      if (saved) {
-        const parsed = JSON.parse(saved) as { supportsVision?: boolean };
-        return parsed.supportsVision === true;
-      }
-    } catch { }
-    return false;
+    return getEphemeralAiConfig()?.supportsVision === true;
   };
 
   const generateAIRecommendations = async (
@@ -733,13 +712,8 @@ const Create = () => {
       const project: any = await createProjectMutation.mutateAsync(projectData);
 
       let apiConfig = undefined;
-      const saved = localStorage.getItem('ai_api_config');
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          apiConfig = { provider: parsed.provider, keys: parsed.keys };
-        } catch { }
-      }
+      const saved = getEphemeralAiConfig();
+      if (saved) apiConfig = { provider: saved.provider, keys: saved.keys };
 
       const result: any = await generateScriptMutation.mutateAsync({
         projectId: project.id,

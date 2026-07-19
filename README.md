@@ -58,8 +58,12 @@ Optional AI, hosted database, and video-generation services may charge and trans
 
 ## Completed
 
+### Basic UGC MP4 export
+
+The current development branch includes a free local FFmpeg export path for 3–8 real product images. It creates a 15-second 1080×1920 MP4 with motion, Malay or bilingual captions, optional voiceover, and low-volume background music. See [docs/UGC_VIDEO_EXPORT.md](docs/UGC_VIDEO_EXPORT.md) for Windows setup, API details, safety limits, and the outdoor fishing hat integration test.
+
 React UI, in-memory products/projects, template UGC script/storyboard generation, local image compression, project display, repository audit, and Malaysia UGC Codex skill.
 
 ## Not production-ready
 
-Secure authentication/secret storage, fully wired provider AI, reliable upload, durable persistence, finished video generation, and current platform-policy/legal approval.
+Secure authentication/secret storage, fully wired provider AI, durable task persistence, production-scale rendering, and current platform-policy/legal approval.

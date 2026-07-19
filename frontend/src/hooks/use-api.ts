@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
+import { getEphemeralAiConfig } from '@/lib/ephemeral-ai-config';
 import type {
   Product,
   Project,
@@ -192,21 +193,9 @@ export function useRecognizeImage() {
   return useMutation({
     mutationFn: async (imageBase64: string): Promise<RecognizeResult> => {
       // 获取保存的配置
-      const saved = localStorage.getItem('ai_api_config');
-      let config = null;
-      let supportsVision = false;
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          config = {
-            provider: parsed.provider,
-            keys: parsed.keys,
-          };
-          supportsVision = parsed.supportsVision || false;
-        } catch (e) {
-          console.error('Parse config error:', e);
-        }
-      }
+      const saved = getEphemeralAiConfig();
+      const config = saved ? { provider: saved.provider, keys: saved.keys } : null;
+      const supportsVision = saved?.supportsVision === true;
 
       const response = await apiClient.post<ApiResponse<RecognizeResult>>('/recognize/image', {
         image: imageBase64,

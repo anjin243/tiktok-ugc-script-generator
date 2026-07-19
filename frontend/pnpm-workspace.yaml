@@ -1,1 +1,4 @@
 neverBuiltDependencies: []
+onlyBuiltDependencies:
+  - '@swc/core'
+  - esbuild

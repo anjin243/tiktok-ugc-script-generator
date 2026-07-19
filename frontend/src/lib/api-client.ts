@@ -1,4 +1,4 @@
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 
 // 检测当前环境，决定 API 基础地址
 const getBaseURL = () => {
@@ -21,35 +21,6 @@ export const apiClient = axios.create({
     'Content-Type': 'application/json',
   },
 });
-
-/**
- * Request interceptor
- */
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('auth_token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-/**
- * Response interceptor
- */
-apiClient.interceptors.response.use(
-  (response) => response,
-  (error: AxiosError) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('auth_token');
-    }
-    return Promise.reject(error);
-  }
-);
 
 /**
  * Type-safe error handler for API errors

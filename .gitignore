@@ -2,6 +2,7 @@ node_modules/
 .cloudstudio/
 .codebuddy/
 downloads/
+output/
 下载/
 *.tar.gz
 *.env

@@ -8,6 +8,7 @@ import { httpLogger } from './middleware/logger'
 import { systemRouter } from './modules/system'
 // Mock API (无需数据库)
 import mockRouter from './modules/mock-api'
+import { ugcVideoRouter } from './modules/ugc-video'
 
 export const createApp = (): Application => {
   const app = express()
@@ -32,6 +33,9 @@ export const createApp = (): Application => {
 
   // Mock API routes (无需数据库)
   app.use(`${env.API_PREFIX}`, mockRouter)
+
+  // Safe local FFmpeg export; no paid video API or uploaded executable is used.
+  app.use(`${env.API_PREFIX}`, ugcVideoRouter)
 
   // Error handling
   app.use(errorHandler)
