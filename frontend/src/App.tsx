@@ -46,7 +46,7 @@ function App() {
             <Route path="/create" data-genie-title="Create Project" data-genie-key="Create" element={<PageTransition transition="fade"><Create /></PageTransition>} />
             <Route path="/projects" data-genie-title="My Projects" data-genie-key="Projects" element={<PageTransition transition="fade"><Projects /></PageTransition>} />
             <Route path="/ugc-export" data-genie-title="UGC MP4 Export" data-genie-key="UgcExport" element={<PageTransition transition="fade"><UgcExport /></PageTransition>} />
-            <Route path="/ai-video" data-genie-title="Human AI Video" data-genie-key="AiVideo" element={<PageTransition transition="fade"><AiVideo /></PageTransition>} />
+            <Route path="/ai-video" data-genie-title="Human AI Video" data-genie-key="AiVideo" element={<AiVideo />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" data-genie-key="NotFound" data-genie-title="Not Found" element={<PageTransition transition="fade"><NotFound /></PageTransition>} />
           </AnimatedRoutes>
