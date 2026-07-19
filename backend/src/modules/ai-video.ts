@@ -181,6 +181,18 @@ export const createAiVideoRouter = (options: AiVideoRouterOptions = {}): Router 
     })
   })
 
+  router.get('/ai-video/openai-status', async (_request: Request, response: Response, next: NextFunction) => {
+    try {
+      if (!keyConfigured()) {
+        throw new AiVideoRequestError(409, 'OPENAI_API_KEY is not configured on the backend')
+      }
+      const status = await client.checkModelAccess('sora-2')
+      response.json({ success: true, data: status })
+    } catch (error) {
+      next(error)
+    }
+  })
+
   router.post('/ai-video/estimate', (request: Request, response: Response, next: NextFunction) => {
     try {
       const parsed = aiVideoInputSchema.safeParse(request.body)

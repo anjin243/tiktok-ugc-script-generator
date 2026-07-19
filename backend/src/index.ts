@@ -2,6 +2,7 @@ import { createApp } from './app'
 import { env } from './config/env'
 import { logger } from './config/logger'
 
+// The local launcher supplies the API key and proxy only to this backend process.
 const startServer = async () => {
   try {
     const app = createApp()

@@ -11,7 +11,16 @@ export interface CreateOpenAiVideoRequest {
   inputReferenceDataUrl: string
 }
 
+export interface OpenAiModelAccessStatus {
+  reachable: boolean
+  authorized: boolean
+  modelAvailable: boolean
+  httpStatus: number | null
+  message: string
+}
+
 export interface OpenAiVideoClientContract {
+  checkModelAccess(model: AiVideoModel): Promise<OpenAiModelAccessStatus>
   createVideo(request: CreateOpenAiVideoRequest): Promise<OpenAiVideoJob>
   retrieveVideo(videoId: string): Promise<OpenAiVideoJob>
   downloadVideo(videoId: string): Promise<Buffer>
@@ -30,16 +39,51 @@ export class OpenAiVideoClient implements OpenAiVideoClientContract {
   }
 
   private async requestJson(url: string, init: RequestInit): Promise<OpenAiVideoJob> {
-    const response = await this.fetchImpl(url, {
-      ...init,
-      headers: {
-        Authorization: `Bearer ${this.apiKey()}`,
-        ...(init.headers ?? {}),
-      },
-    })
+    let response: Response
+    try {
+      response = await this.fetchImpl(url, {
+        ...init,
+        headers: {
+          Authorization: `Bearer ${this.apiKey()}`,
+          ...(init.headers ?? {}),
+        },
+      })
+    } catch {
+      throw new Error('OpenAI network request failed before a video ID was received. Verify the backend proxy and do not retry automatically.')
+    }
     const payload = await response.json().catch(() => ({})) as OpenAiVideoJob & { error?: { message?: string } }
     if (!response.ok) throw new Error(`OpenAI Videos API request failed (${response.status}): ${payload.error?.message ?? 'unknown error'}`)
     return payload
+  }
+
+  async checkModelAccess(model: AiVideoModel): Promise<OpenAiModelAccessStatus> {
+    let response: Response
+    try {
+      response = await this.fetchImpl(`${OPENAI_API_BASE_URL}/models/${encodeURIComponent(model)}`, {
+        method: 'GET',
+        headers: { Authorization: `Bearer ${this.apiKey()}` },
+      })
+    } catch {
+      return {
+        reachable: false,
+        authorized: false,
+        modelAvailable: false,
+        httpStatus: null,
+        message: 'OpenAI is unreachable from the backend. Check the proxy before any paid retry.',
+      }
+    }
+
+    return {
+      reachable: true,
+      authorized: response.status !== 401,
+      modelAvailable: response.ok,
+      httpStatus: response.status,
+      message: response.ok
+        ? `${model} is reachable for this API project.`
+        : response.status === 401
+          ? 'OpenAI rejected the backend API key.'
+          : `${model} is not available to this API project (HTTP ${response.status}).`,
+    }
   }
 
   createVideo(request: CreateOpenAiVideoRequest): Promise<OpenAiVideoJob> {

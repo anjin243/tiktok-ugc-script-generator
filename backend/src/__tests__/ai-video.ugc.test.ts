@@ -7,6 +7,7 @@ import { createAiVideoRouter } from '../modules/ai-video'
 import {
   OpenAiVideoClient,
   type CreateOpenAiVideoRequest,
+  type OpenAiModelAccessStatus,
   type OpenAiVideoClientContract,
 } from '../services/openai-video-client'
 import type { OpenAiVideoJob } from '../types/ai-video.types'
@@ -34,6 +35,10 @@ const baseInput = {
 
 class FakeVideoClient implements OpenAiVideoClientContract {
   createCalls: CreateOpenAiVideoRequest[] = []
+
+  async checkModelAccess(): Promise<OpenAiModelAccessStatus> {
+    return { reachable: true, authorized: true, modelAvailable: true, httpStatus: 200, message: 'mock access ok' }
+  }
 
   async createVideo(input: CreateOpenAiVideoRequest): Promise<OpenAiVideoJob> {
     this.createCalls.push(input)
@@ -84,6 +89,19 @@ describe('AI human video paid-call guard and task flow', () => {
       size: '1024x1792',
     }).expect(200)
     expect(pro.body.data.estimatedTotalUsd).toBe(8)
+    expect(fakeClient.createCalls).toHaveLength(0)
+  })
+
+  it('checks model access without creating a paid video job', async () => {
+    const fakeClient = new FakeVideoClient()
+    const app = express().use(express.json()).use('/api', createAiVideoRouter({
+      client: fakeClient,
+      apiKeyConfigured: () => true,
+      storageRoot,
+    }))
+
+    const result = await request(app).get('/api/ai-video/openai-status').expect(200)
+    expect(result.body.data).toMatchObject({ reachable: true, authorized: true, modelAvailable: true })
     expect(fakeClient.createCalls).toHaveLength(0)
   })
 
