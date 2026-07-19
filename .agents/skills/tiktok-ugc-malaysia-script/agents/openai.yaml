@@ -1,0 +1,4 @@
+interface:
+  display_name: "TikTok Malaysia UGC Script"
+  short_description: "Create compliant Malay UGC scripts"
+  default_prompt: "Use $tiktok-ugc-malaysia-script to create a Malay TikTok Shop UGC script with Chinese translation."
