@@ -53,6 +53,38 @@ $env:NODE_ENV = 'development'
 $env:PORT = '3000'
 $env:ESBUILD_BINARY_PATH = $esbuild
 
+# Node fetch does not use the Windows Internet proxy unless environment-proxy
+# support is enabled before Node starts. Prefer an explicitly supplied proxy;
+# otherwise safely mirror the current WinINET proxy without displaying it.
+$proxyUrl = $env:HTTPS_PROXY
+if ([string]::IsNullOrWhiteSpace($proxyUrl)) {
+  $internetSettings = Get-ItemProperty -LiteralPath 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings' -ErrorAction SilentlyContinue
+  if ($internetSettings.ProxyEnable -eq 1 -and -not [string]::IsNullOrWhiteSpace($internetSettings.ProxyServer)) {
+    $proxyEntries = @($internetSettings.ProxyServer -split ';')
+    $selectedProxy = $proxyEntries | Where-Object { $_ -match '^https=' } | Select-Object -First 1
+    if (-not $selectedProxy) {
+      $selectedProxy = $proxyEntries | Where-Object { $_ -match '^http=' } | Select-Object -First 1
+    }
+    if (-not $selectedProxy -and $proxyEntries.Count -eq 1) {
+      $selectedProxy = $proxyEntries[0]
+    }
+    if ($selectedProxy) {
+      $selectedProxy = $selectedProxy -replace '^[a-zA-Z]+=', ''
+      $proxyUrl = if ($selectedProxy -match '^[a-zA-Z]+://') { $selectedProxy } else { "http://$selectedProxy" }
+    }
+  }
+}
+
+if (-not [string]::IsNullOrWhiteSpace($proxyUrl)) {
+  $env:HTTPS_PROXY = $proxyUrl
+  $env:HTTP_PROXY = $proxyUrl
+  $env:NO_PROXY = 'localhost,127.0.0.1'
+  $env:NODE_USE_ENV_PROXY = '1'
+  Write-Host 'Windows proxy detected and enabled for Node/OpenAI requests.' -ForegroundColor Green
+} else {
+  Write-Host 'No proxy was detected; Node will connect directly.' -ForegroundColor Yellow
+}
+
 Set-Location -LiteralPath 'Z:\backend'
 Write-Host ''
 Write-Host 'Starting backend on http://localhost:3000/api ...' -ForegroundColor Green
