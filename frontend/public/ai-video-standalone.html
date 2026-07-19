@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>真人AI视频 · 稳定版</title>
+  <style>
+    :root{color-scheme:dark;font-family:Inter,system-ui,"Microsoft YaHei",sans-serif;background:#0b0d12;color:#f5f7fb}
+    *{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#0b0d12,#111827);min-height:100vh}
+    main{width:min(1120px,calc(100% - 32px));margin:auto;padding:32px 0 64px}.top{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap}
+    h1{margin:0;font-size:30px}h2{font-size:18px;margin:0 0 16px}.muted{color:#a7b0c0}.notice,.card{border:1px solid #293246;border-radius:16px;background:#121722;padding:20px}.notice{margin:20px 0;border-color:#7c5b20;background:#241c0d}
+    .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px}.stack{display:grid;gap:20px}.fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}.full{grid-column:1/-1}
+    label{display:grid;gap:7px;font-size:14px;color:#d8deea}input,textarea,select,button{font:inherit}input,textarea,select{width:100%;border:1px solid #354059;border-radius:10px;background:#0b0f17;color:#fff;padding:11px 12px}textarea{min-height:88px;resize:vertical}
+    button{border:0;border-radius:10px;padding:12px 16px;font-weight:700;cursor:pointer;background:#6d5dfc;color:#fff}button.secondary{background:#253047}button.danger{background:#8e2f3d}button:disabled{opacity:.45;cursor:not-allowed}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.status{white-space:pre-wrap;word-break:break-word;border-radius:10px;background:#090c12;padding:14px;min-height:52px;color:#cbd5e1}.scene{border:1px solid #30394c;border-radius:12px;padding:14px;margin-top:12px}.scene video{width:100%;max-height:420px;background:#000;border-radius:10px;margin-top:10px}.price{font-size:22px;font-weight:800;color:#9ee6b4}
+    .images{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}.images img{width:100%;aspect-ratio:9/16;object-fit:cover;border-radius:8px;border:1px solid #354059}
+    @media(max-width:800px){.grid,.fields{grid-template-columns:1fr}.full{grid-column:auto}.images{grid-template-columns:repeat(2,1fr)}}
+  </style>
+</head>
+<body>
+<main>
+  <div class="top"><div><h1>真人AI视频 · 稳定版</h1><div class="muted">产品图＋描述 → Sora真人动态镜头 → 逐镜审核</div></div><a href="/" style="color:#b9b1ff">返回首页</a></div>
+  <div class="notice"><strong>付费保护已开启。</strong>费用估算、上传图片和创建任务不会调用模型；只有完成费用确认后再点击单个镜头的“生成”按钮，才会发生一次付费调用。不会自动重试。</div>
+  <div class="grid">
+    <div class="stack">
+      <section class="card"><h2>1. 商品与真人镜头描述</h2><div class="fields">
+        <label>商品名称<input id="productName" autocomplete="off"></label>
+        <label>目标市场<input id="targetMarket" value="Malaysia"></label>
+        <label class="full">真实卖点（每行一个）<textarea id="sellingPoints"></textarea></label>
+        <label class="full">真人模特描述<input id="modelDescription" value="虚构的25至35岁马来西亚成年女性，休闲运动穿搭"></label>
+        <label>使用场景<input id="usageScene" value="户外运动场与日常健身场景"></label>
+        <label>视频风格<input id="videoStyle" value="写实手持TikTok UGC"></label>
+        <label class="full">禁止改变的产品细节（每行一个）<textarea id="immutableDetails"></textarea></label>
+        <label>视频语言<input id="videoLanguage" value="Malay"></label>
+        <label>字幕<select id="subtitleMode"><option value="bilingual">马来语＋中文</option><option value="malay">仅马来语</option></select></label>
+      </div></section>
+      <section class="card"><h2>2. 产品参考图</h2><div class="muted">上传1–4张JPEG、PNG或WebP真实商品图。</div><input id="images" type="file" accept="image/jpeg,image/png,image/webp" multiple><div id="imagePreview" class="images"></div></section>
+      <section class="card"><h2>3. 模型与费用</h2><div class="fields">
+        <label>模型<select id="model"><option value="sora-2">sora-2（默认）</option><option value="sora-2-pro">sora-2-pro（较高费用）</option></select></label>
+        <label>竖屏规格<select id="size"><option value="720x1280">720×1280</option></select></label>
+        <label>每镜时长<select id="clipSeconds"><option value="4">4秒（推荐）</option><option value="8">8秒</option></select></label>
+        <label>镜头数量<select id="sceneCount"><option value="4">4个</option><option value="3">3个</option></select></label>
+      </div><div class="row" style="margin-top:16px"><button id="estimateButton" class="secondary">计算调用次数与预计费用</button><button id="createButton" disabled>创建任务（不调用付费API）</button></div><div id="estimate" style="margin-top:14px"></div></section>
+    </div>
+    <aside class="stack">
+      <section class="card"><h2>后端连接</h2><div id="capabilities" class="status">正在检查…</div></section>
+      <section class="card"><h2>费用确认与逐镜生成</h2><div id="taskArea" class="status">请先计算费用并创建任务。</div></section>
+      <section class="card"><h2>操作信息</h2><div id="message" class="status">稳定版页面已加载。</div></section>
+    </aside>
+  </div>
+</main>
+<script>
+  const $ = id => document.getElementById(id)
+  let estimate = null
+  let task = null
+  let capabilities = null
+  let pollTimer = null
+
+  const lines = id => $(id).value.split(/\r?\n/).map(value => value.trim()).filter(Boolean)
+  const input = () => ({
+    productName: $('productName').value.trim(), sellingPoints: lines('sellingPoints'),
+    targetMarket: $('targetMarket').value.trim(), modelDescription: $('modelDescription').value.trim(),
+    usageScene: $('usageScene').value.trim(), videoStyle: $('videoStyle').value.trim(),
+    immutableDetails: lines('immutableDetails'), videoLanguage: $('videoLanguage').value.trim(),
+    subtitleMode: $('subtitleMode').value, model: $('model').value, size: $('size').value,
+    clipSeconds: Number($('clipSeconds').value), sceneCount: Number($('sceneCount').value)
+  })
+  const message = value => $('message').textContent = value
+  const unwrap = async response => {
+    const payload = await response.json().catch(() => ({}))
+    if (!response.ok) throw new Error(payload.message || `请求失败：HTTP ${response.status}`)
+    return payload.data
+  }
+  const request = async (url, options) => unwrap(await fetch(url, options))
+
+  async function loadCapabilities() {
+    try {
+      capabilities = await request('/api/ai-video/capabilities')
+      $('capabilities').textContent = `连接正常\nAPI Key：${capabilities.apiKeyConfigured ? '已配置' : '未配置'}\n默认模型：${capabilities.defaultModel}\n自动付费重试：关闭\n${capabilities.modelLifecycleNotice || ''}`
+    } catch (error) { $('capabilities').textContent = `后端连接失败：${error.message}` }
+  }
+
+  function renderEstimate() {
+    $('estimate').innerHTML = estimate ? `<div class="price">约 $${estimate.estimatedTotalUsd.toFixed(2)} USD</div><div class="muted">${estimate.callCount}次调用 · ${estimate.totalBillableSeconds}计费秒 · $${estimate.pricePerSecondUsd.toFixed(2)}/秒</div>` : ''
+    $('createButton').disabled = !estimate
+  }
+
+  function renderTask() {
+    if (!task) return
+    const authorized = Boolean(task.costAuthorizedAt)
+    $('taskArea').className = ''
+    $('taskArea').innerHTML = `<div>任务：${task.id}<br>状态：${task.status}<br>估算上限：$${task.estimate.estimatedTotalUsd.toFixed(2)} USD</div>` +
+      (authorized ? '<div class="notice">费用已确认。点击某个镜头生成按钮时才会付费。</div>' : `<div class="notice"><label class="row"><input id="costCheck" type="checkbox" style="width:auto">我已查看费用并理解失败也可能计费</label><input id="phrase" placeholder="输入：确认付费生成"><button id="authorizeButton" style="width:100%;margin-top:10px">确认费用（仍不生成）</button></div>`) +
+      task.scenes.map(scene => `<div class="scene"><strong>镜头${scene.index} · ${scene.title}</strong><div>${scene.status} · ${scene.progress}%</div>${scene.previewUrl ? `<video controls src="${scene.previewUrl}"></video>` : ''}${scene.error ? `<div style="color:#ff9aa8">${scene.error}</div>` : ''}<div class="row" style="margin-top:10px">${scene.status === 'planned' && authorized ? `<button data-generate="${scene.index}">生成镜头${scene.index}（付费）</button>` : ''}${scene.status === 'awaiting_review' ? `<button data-approve="${scene.index}">确认可发布</button><button class="danger" data-reject="${scene.index}">不可发布</button>` : ''}</div></div>`).join('') +
+      (!task.stopFutureScenes ? '<button id="cancelButton" class="secondary" style="width:100%;margin-top:14px">取消所有后续镜头</button>' : '<div class="notice">已停止后续镜头。</div>')
+
+    $('authorizeButton')?.addEventListener('click', authorize)
+    $('cancelButton')?.addEventListener('click', cancelFuture)
+    document.querySelectorAll('[data-generate]').forEach(button => button.addEventListener('click', () => generateScene(Number(button.dataset.generate))))
+    document.querySelectorAll('[data-approve]').forEach(button => button.addEventListener('click', () => reviewScene(Number(button.dataset.approve), true)))
+    document.querySelectorAll('[data-reject]').forEach(button => button.addEventListener('click', () => reviewScene(Number(button.dataset.reject), false)))
+    managePolling()
+  }
+
+  function managePolling() {
+    const active = task?.scenes.some(scene => ['queued','in_progress'].includes(scene.status))
+    if (active && !pollTimer) pollTimer = setInterval(refreshTask, 1500)
+    if (!active && pollTimer) { clearInterval(pollTimer); pollTimer = null }
+  }
+  async function refreshTask() { try { task = await request(`/api/ai-video/tasks/${task.id}`); renderTask() } catch (error) { message(error.message) } }
+
+  $('model').addEventListener('change', () => {
+    $('size').innerHTML = $('model').value === 'sora-2-pro' ? '<option value="720x1280">720×1280</option><option value="1024x1792">1024×1792</option>' : '<option value="720x1280">720×1280</option>'
+    estimate = null; task = null; renderEstimate(); $('taskArea').textContent = '模型已变化，请重新计算费用。'
+  })
+  $('images').addEventListener('change', event => {
+    const files = Array.from(event.target.files || []).slice(0, 4)
+    $('imagePreview').innerHTML = ''
+    files.forEach(file => { const image = document.createElement('img'); image.src = URL.createObjectURL(file); image.alt = file.name; $('imagePreview').appendChild(image) })
+    if ((event.target.files || []).length > 4) message('最多使用前4张图片。')
+  })
+  $('estimateButton').addEventListener('click', async () => {
+    try { message('正在计算费用…'); estimate = await request('/api/ai-video/estimate', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(input())}); renderEstimate(); message('费用估算完成，尚未调用付费API。') } catch (error) { message(error.message) }
+  })
+  $('createButton').addEventListener('click', async () => {
+    try {
+      const files = Array.from($('images').files || [])
+      if (files.length < 1 || files.length > 4) throw new Error('请上传1至4张真实产品参考图。')
+      const form = new FormData(); files.forEach(file => form.append('images', file, file.name)); form.append('metadata', JSON.stringify(input()))
+      message('正在创建无费用任务…'); task = await request('/api/ai-video/tasks', {method:'POST',body:form}); renderTask(); message('任务已创建，尚未调用付费API。')
+    } catch (error) { message(error.message) }
+  })
+  async function authorize() {
+    try {
+      if (!$('costCheck').checked || $('phrase').value !== capabilities?.explicitConfirmationPhrase) throw new Error('请勾选费用确认并准确输入“确认付费生成”。')
+      task = await request(`/api/ai-video/tasks/${task.id}/authorize-cost`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({confirmed:true,confirmationPhrase:$('phrase').value,acceptedEstimatedCostUsd:task.estimate.estimatedTotalUsd})})
+      renderTask(); message('费用已确认，但仍未调用付费API。')
+    } catch (error) { message(error.message) }
+  }
+  async function generateScene(index) { try { message(`正在提交镜头${index}，此操作会产生一次付费调用…`); task = await request(`/api/ai-video/tasks/${task.id}/scenes/${index}/generate`, {method:'POST'}); renderTask() } catch (error) { message(error.message) } }
+  async function reviewScene(index, approved) { try { const review = {productColorCorrect:approved,structureCorrect:approved,logoAcceptable:approved,quantityCorrect:approved,accessoriesCorrect:approved,notes:approved?'':'已由用户标记不可发布'}; task = await request(`/api/ai-video/tasks/${task.id}/scenes/${index}/review`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({approved,review})}); renderTask() } catch (error) { message(error.message) } }
+  async function cancelFuture() { try { task = await request(`/api/ai-video/tasks/${task.id}/cancel-future-scenes`, {method:'POST'}); renderTask(); message('已取消所有尚未提交的后续镜头。') } catch (error) { message(error.message) } }
+
+  loadCapabilities()
+</script>
+</body>
+</html>
